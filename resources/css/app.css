@@ -1,0 +1,6 @@
+@import 'datatables.net-dt';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'bootstrap';
+@import 'datatables.net-bs5';
