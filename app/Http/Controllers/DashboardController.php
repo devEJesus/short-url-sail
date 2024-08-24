@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\RedirectUrl;
 use App\Models\Url;
 use App\Services\UrlService;
 use Illuminate\Http\Request;
@@ -36,17 +37,17 @@ class DashboardController extends Controller
 
     public function redirect(string $shortCode)
     {
-        $cache = Cache::store("redis")->get($shortCode);
+        $longUrl = Cache::store("redis")->get($shortCode);
 
-        if($cache)
-            return redirect()->away($cache);
-
-        $url = Url::where('short_url', $shortCode)->firstOrFail();
+        if(!$longUrl){
+            $url = Url::where('short_url', $shortCode)->firstOrFail();
         
-        $longUrl = $url->long_url;
-
-        Cache::store("redis")->put($shortCode, $longUrl, 120);
-
+            $longUrl = $url->long_url;
+    
+            Cache::store("redis")->put($shortCode, $longUrl, 120);
+        }
+        
+        RedirectUrl::dispatch();
         return redirect()->away($longUrl);
     }
 
